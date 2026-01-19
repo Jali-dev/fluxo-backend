@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:receive_sharing_intent_plus/receive_sharing_intent_plus.dart';
+import 'package:fluxo/features/home/presentation/bloc/home_cubit.dart';
+import 'package:fluxo/features/home/presentation/bloc/home_state.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,7 +14,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late StreamSubscription _intentDataStreamSubscription;
-  String? _sharedText;
 
   @override
   void initState() {
@@ -22,7 +24,7 @@ class _HomePageState extends State<HomePage> {
         .getMediaStream()
         .listen((List<SharedMediaFile> value) {
       if (value.isNotEmpty && value.first.type == SharedMediaType.text) {
-         _handleSharedText(value.first.path); // path contains text/URL for SharedMediaType.text
+        _processLink(value.first.path);
       }
     }, onError: (err) {
       debugPrint("getIntentDataStream error: $err");
@@ -31,16 +33,14 @@ class _HomePageState extends State<HomePage> {
     // 2. Handle link when app is opened from closed state (Cold Start)
     ReceiveSharingIntentPlus.instance.getInitialMedia().then((List<SharedMediaFile> value) {
       if (value.isNotEmpty && value.first.type == SharedMediaType.text) {
-        _handleSharedText(value.first.path);
+        _processLink(value.first.path);
       }
     });
   }
 
-  void _handleSharedText(String text) {
-     setState(() {
-      _sharedText = text;
-    });
-    debugPrint("Fluxo Shared Link Received: $text");
+  void _processLink(String link) {
+    debugPrint("Link received: $link");
+    context.read<HomeCubit>().onLinkReceived(link);
   }
 
   @override
@@ -52,30 +52,84 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Fluxo Home')),
+      appBar: AppBar(title: const Text('Fluxo Player')),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Esperando enlace...'),
-            if (_sharedText != null) ...[
-              const SizedBox(height: 20),
-              const Text(
-                'Enlace Recibido:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  _sharedText!,
-                  style: const TextStyle(color: Colors.blue, fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ]
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: BlocBuilder<HomeCubit, HomeState>(
+            builder: (context, state) {
+              if (state is HomeInitial) {
+                return const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                     Icon(Icons.share, size: 64, color: Colors.grey),
+                     SizedBox(height: 16),
+                     Text('Comparte un enlace de Facebook con Fluxo para comenzar.'),
+                  ],
+                );
+              } else if (state is HomeLoading) {
+                return const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Extrayendo video...'),
+                  ],
+                );
+              } else if (state is HomeVideoLoaded) {
+                 final video = state.video;
+                 return SingleChildScrollView(
+                   child: Column(
+                     mainAxisAlignment: MainAxisAlignment.center,
+                     children: [
+                       if (video.thumbnail.isNotEmpty)
+                         Image.network(video.thumbnail, errorBuilder: (_,__,___) => const Icon(Icons.broken_image, size: 50)),
+                       const SizedBox(height: 20),
+                       Text(
+                         video.title,
+                         style: Theme.of(context).textTheme.headlineSmall,
+                         textAlign: TextAlign.center,
+                       ),
+                       const SizedBox(height: 10),
+                       Chip(label: Text(video.type.toUpperCase())),
+                       const SizedBox(height: 20),
+                       Text(
+                         'Direct URL:',
+                         style: Theme.of(context).textTheme.labelLarge,
+                       ),
+                       SelectableText(
+                         video.directUrl,
+                         textAlign: TextAlign.center,
+                         style: const TextStyle(color: Colors.blueAccent),
+                       ),
+                     ],
+                   ),
+                 );
+              } else if (state is HomeError) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                    const SizedBox(height: 16),
+                    Text(
+                      state.message,
+                      style: const TextStyle(color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () => context.read<HomeCubit>().reset(),
+                      child: const Text('Intentar de nuevo'),
+                    )
+                  ],
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
         ),
       ),
     );
   }
 }
+
