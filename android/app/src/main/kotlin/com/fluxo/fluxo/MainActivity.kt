@@ -39,17 +39,30 @@ class MainActivity: FlutterActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        castContext = CastContext.getSharedInstance(this)
+        try {
+            castContext = CastContext.getSharedInstance(this)
+        } catch (e: Exception) {
+            // Log error but allow app to start
+            android.util.Log.e("FluxoCast", "Error initializing CastContext", e)
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        castContext?.sessionManager?.addSessionManagerListener(sessionManagerListener, CastSession::class.java)
+        try {
+            castContext?.sessionManager?.addSessionManagerListener(sessionManagerListener, CastSession::class.java)
+        } catch (e: Exception) {
+            android.util.Log.e("FluxoCast", "Error adding session listener", e)
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        castContext?.sessionManager?.removeSessionManagerListener(sessionManagerListener, CastSession::class.java)
+        try {
+            castContext?.sessionManager?.removeSessionManagerListener(sessionManagerListener, CastSession::class.java)
+        } catch (e: Exception) {
+            android.util.Log.e("FluxoCast", "Error removing session listener", e)
+        }
     }
 
     private fun startCastService() {
