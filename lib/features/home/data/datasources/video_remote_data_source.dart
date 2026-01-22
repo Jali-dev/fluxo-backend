@@ -15,7 +15,7 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDataSource {
   Future<VideoModel> extractVideo(String socialUrl) async {
     // API URL from constants or config.
     // For now we assume a placeholder, user needs to inject the real Koyeb URL.
-    final String apiUrl = AppConstants.kBackendUrl; 
+    const String apiUrl = AppConstants.kBackendUrl; 
     
     if (apiUrl.isEmpty) {
         throw Exception("Backend URL not configured");
