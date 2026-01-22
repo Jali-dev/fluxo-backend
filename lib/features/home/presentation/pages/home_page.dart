@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/services.dart'; // For MethodChannel
 // import 'package:receive_sharing_intent_plus/receive_sharing_intent_plus.dart';
 import 'package:fluxo/features/home/presentation/bloc/home_cubit.dart';
 import 'package:fluxo/features/home/presentation/bloc/home_state.dart';
@@ -13,33 +14,36 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late StreamSubscription _intentDataStreamSubscription;
+  static const platform = MethodChannel('com.fluxo.fluxo/cast');
 
   @override
   void initState() {
     super.initState();
 
-    // 1. Listen for links while app is in memory (Warm Start)
-    /*
-    _intentDataStreamSubscription = ReceiveSharingIntentPlus
-        .getMediaStream()
-        .listen((List<SharedMediaFile> value) {
-      if (value.isNotEmpty && value.first.type == SharedMediaType.text) {
-        _processLink(value.first.path);
-      }
-    }, onError: (err) {
-      debugPrint("getIntentDataStream error: $err");
-    });
-    */
+    // 1. Cold Start: Check if app was opened with a link
+    _checkInitialLink();
 
-    // 2. Handle link when app is opened from closed state (Cold Start)
-    /*
-    ReceiveSharingIntentPlus.getInitialMedia().then((List<SharedMediaFile> value) {
-      if (value.isNotEmpty && value.first.type == SharedMediaType.text) {
-        _processLink(value.first.path);
+    // 2. Warm Start: Listen for new links while app is open
+    platform.setMethodCallHandler((call) async {
+      if (call.method == "onLinkReceived") {
+        debugPrint("Native link received: ${call.arguments}");
+        if (call.arguments is String) {
+           _processLink(call.arguments);
+        }
       }
     });
-    */
+  }
+
+  Future<void> _checkInitialLink() async {
+    try {
+      final String? url = await platform.invokeMethod('getInitialLink');
+      if (url != null && url.isNotEmpty) {
+        debugPrint("Initial link found: $url");
+        _processLink(url);
+      }
+    } catch (e) {
+      debugPrint("Error checking initial link: $e");
+    }
   }
 
   void _processLink(String link) {
@@ -49,7 +53,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    _intentDataStreamSubscription.cancel();
+    // Remove method call handler? Typically not explicitly needed for singleton widget
+    // but good practice if we want to stop listening.
+    // platform.setMethodCallHandler(null);
     super.dispose();
   }
 

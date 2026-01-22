@@ -37,13 +37,34 @@ class MainActivity: FlutterActivity() {
         override fun onSessionSuspended(session: CastSession, reason: Int) {}
     }
 
+    private var pendingSharedUrl: String? = null
+    private var flutterEngineInstance: FlutterEngine? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        handleIntent(intent)
         try {
             castContext = CastContext.getSharedInstance(this)
         } catch (e: Exception) {
             // Log error but allow app to start
             android.util.Log.e("FluxoCast", "Error initializing CastContext", e)
+        }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: android.content.Intent) {
+        if (android.content.Intent.ACTION_SEND == intent.action && "text/plain" == intent.type) {
+            intent.getStringExtra(android.content.Intent.EXTRA_TEXT)?.let { url ->
+                pendingSharedUrl = url
+                // If Flutter is ready, send it immediately
+                flutterEngineInstance?.dartExecutor?.binaryMessenger?.let { messenger ->
+                    MethodChannel(messenger, CHANNEL).invokeMethod("onLinkReceived", url)
+                }
+            }
         }
     }
 
@@ -79,11 +100,18 @@ class MainActivity: FlutterActivity() {
         stopService(intent)
     }
 
+
+
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        flutterEngineInstance = flutterEngine
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
+                "getInitialLink" -> {
+                    result.success(pendingSharedUrl)
+                    pendingSharedUrl = null
+                }
                 "initCast" -> {
                     try {
                         castContext = CastContext.getSharedInstance(this)
