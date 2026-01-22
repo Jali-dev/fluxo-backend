@@ -4,7 +4,7 @@
 
 Servicio REST minimalista para la extracción de metadatos y URLs directas de videos (específicamente Facebook/Meta) utilizando `yt-dlp`.
 
-- **Base URL (Producción)**: `https://fluxo-backend-w7xs.onrender.com`
+- **Base URL (Producción)**: `https://fluxo-backend-rsqy.onrender.com`
 - **Protocol**: HTTPS
 - **Format**: JSON
 
