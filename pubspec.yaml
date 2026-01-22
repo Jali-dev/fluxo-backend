@@ -23,7 +23,7 @@ dependencies:
 
   # UI/Icons
   cupertino_icons: ^1.0.6
-  receive_sharing_intent_plus: ^1.0.1
+  # receive_sharing_intent_plus: ^1.0.1 (Incompatible with Gradle 8+)
   dio: ^5.9.0
 
 dev_dependencies:

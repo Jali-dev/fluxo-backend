@@ -22,5 +22,16 @@ Future<void> init() async {
   );
 
   // External
-  sl.registerLazySingleton(() => Dio());
+  // External - HTTP Client with Timeout configuration
+  sl.registerLazySingleton(() {
+    final options = BaseOptions(
+      connectTimeout: const Duration(seconds: 10), // Connection handshake
+      receiveTimeout: const Duration(seconds: 120), // Waiting for massive extraction
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    );
+    return Dio(options);
+  });
 }

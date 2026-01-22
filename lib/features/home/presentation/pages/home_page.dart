@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:receive_sharing_intent_plus/receive_sharing_intent_plus.dart';
+// import 'package:receive_sharing_intent_plus/receive_sharing_intent_plus.dart';
 import 'package:fluxo/features/home/presentation/bloc/home_cubit.dart';
 import 'package:fluxo/features/home/presentation/bloc/home_state.dart';
 
@@ -20,7 +20,8 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     // 1. Listen for links while app is in memory (Warm Start)
-    _intentDataStreamSubscription = ReceiveSharingIntentPlus.instance
+    /*
+    _intentDataStreamSubscription = ReceiveSharingIntentPlus
         .getMediaStream()
         .listen((List<SharedMediaFile> value) {
       if (value.isNotEmpty && value.first.type == SharedMediaType.text) {
@@ -29,13 +30,16 @@ class _HomePageState extends State<HomePage> {
     }, onError: (err) {
       debugPrint("getIntentDataStream error: $err");
     });
+    */
 
     // 2. Handle link when app is opened from closed state (Cold Start)
-    ReceiveSharingIntentPlus.instance.getInitialMedia().then((List<SharedMediaFile> value) {
+    /*
+    ReceiveSharingIntentPlus.getInitialMedia().then((List<SharedMediaFile> value) {
       if (value.isNotEmpty && value.first.type == SharedMediaType.text) {
         _processLink(value.first.path);
       }
     });
+    */
   }
 
   void _processLink(String link) {
@@ -102,6 +106,41 @@ class _HomePageState extends State<HomePage> {
                          textAlign: TextAlign.center,
                          style: const TextStyle(color: Colors.blueAccent),
                        ),
+                       const SizedBox(height: 30),
+                       const Divider(),
+                       const Text("Controles Cast", style: TextStyle(fontWeight: FontWeight.bold)),
+                       const SizedBox(height: 10),
+                       Row(
+                         mainAxisAlignment: MainAxisAlignment.center,
+                         children: [
+                           IconButton(
+                             icon: const Icon(Icons.stop, color: Colors.red),
+                             onPressed: () => context.read<HomeCubit>().stopCast(),
+                             tooltip: "Stop",
+                           ),
+                           IconButton(
+                             icon: const Icon(Icons.pause),
+                             onPressed: () => context.read<HomeCubit>().pauseCast(),
+                             tooltip: "Pause",
+                           ),
+                           IconButton(
+                             icon: const Icon(Icons.play_arrow),
+                             onPressed: () => context.read<HomeCubit>().playCast(),
+                             tooltip: "Play",
+                           ),
+                         ],
+                       ),
+                       Row(
+                         mainAxisAlignment: MainAxisAlignment.center,
+                         children: [
+                           const Icon(Icons.volume_down, size: 20),
+                           Slider(
+                             value: 0.5, 
+                             onChanged: (val) => context.read<HomeCubit>().setVolume(val),
+                           ),
+                           const Icon(Icons.volume_up, size: 20),
+                         ],
+                       )
                      ],
                    ),
                  );

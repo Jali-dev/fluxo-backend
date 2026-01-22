@@ -32,8 +32,19 @@ class VideoRemoteDataSourceImpl implements VideoRemoteDataSource {
       } else {
         throw Exception("Failed to extract video: ${response.statusCode}");
       }
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout || 
+          e.type == DioExceptionType.receiveTimeout) {
+        throw Exception("El servidor tardó demasiado (Timeout). Intenta con un video más corto.");
+      } else if (e.response != null) {
+        // Backend returned an error (400, 422, 500)
+        final errorMsg = e.response?.data['error'] ?? 'Error desconocido del servidor';
+        throw Exception(errorMsg);
+      } else {
+        throw Exception("Error de conexión: Verifica tu internet.");
+      }
     } catch (e) {
-      throw Exception("Network error: $e");
+      throw Exception("Error inesperado: $e");
     }
   }
 }
