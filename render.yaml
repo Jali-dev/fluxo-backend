@@ -3,8 +3,7 @@ services:
     name: fluxo-backend
     env: docker
     plan: free
-    # Indica a Render que el Dockerfile está en la carpeta backend/
-    dockerContext: backend/
-    envVars:
-      - key: PORT
-        value: 10000
+    # Indica a Render que el contexto de construcción es la carpeta backend
+    rootDir: .
+    dockerContext: backend
+    dockerfilePath: backend/Dockerfile
