@@ -54,4 +54,5 @@ flutter {
 
 dependencies {
     implementation("com.google.android.gms:play-services-cast-framework:21.4.0")
+    implementation("androidx.mediarouter:mediarouter:1.7.0")
 }

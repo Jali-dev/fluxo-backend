@@ -62,7 +62,18 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Fluxo Player')),
+      appBar: AppBar(
+        title: const Text('Fluxo Player'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.cast),
+            onPressed: () {
+               _HomePageState.platform.invokeMethod('showRouteSelector');
+            },
+            tooltip: "Conectar a TV",
+          )
+        ],
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -107,11 +118,13 @@ class _HomePageState extends State<HomePage> {
                          'Direct URL:',
                          style: Theme.of(context).textTheme.labelLarge,
                        ),
-                       SelectableText(
-                         video.directUrl,
-                         textAlign: TextAlign.center,
-                         style: const TextStyle(color: Colors.blueAccent),
-                       ),
+                        SelectableText(
+                          video.directUrl,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.blueAccent, fontSize: 12),
+                          maxLines: 3,
+                          // overflow: TextOverflow.ellipsis, // SelectableText doesn't support overflow ellipsis effectively in all versions, but maxLines helps.
+                        ),
                        const SizedBox(height: 30),
                        const Divider(),
                        const Text("Controles Cast", style: TextStyle(fontWeight: FontWeight.bold)),

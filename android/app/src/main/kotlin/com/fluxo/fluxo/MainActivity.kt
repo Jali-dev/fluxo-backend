@@ -4,7 +4,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.annotation.NonNull
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import com.google.android.gms.cast.MediaInfo
@@ -14,8 +14,13 @@ import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.CastSession
 import com.google.android.gms.cast.framework.SessionManager
 import com.google.android.gms.common.images.WebImage
+import androidx.mediarouter.app.MediaRouteChooserDialogFragment
+import androidx.mediarouter.app.MediaRouteControllerDialogFragment
+import androidx.mediarouter.media.MediaRouteSelector
+import androidx.mediarouter.media.MediaRouter
+import com.google.android.gms.cast.CastMediaControlIntent
 
-class MainActivity: FlutterActivity() {
+class MainActivity: FlutterFragmentActivity() {
     private val CHANNEL = "com.fluxo.fluxo/cast"
     private var castContext: CastContext? = null
 
@@ -171,13 +176,34 @@ class MainActivity: FlutterActivity() {
                     }
                 }
                 "showRouteSelector" -> {
-                    // This is a simplified way to trigger discovery/selection if needed.
-                    // Ideally, use a PlatformView for the button.
-                    // Or keep it simple: The Cast SDK manages the button visibility usually.
+                    showCastDialog()
                     result.success(true) 
                 }
                 else -> result.notImplemented()
             }
+        }
+    }
+
+    private fun showCastDialog() {
+        try {
+            val castContext = CastContext.getSharedInstance(this)
+            val session = castContext.sessionManager.currentCastSession
+            
+            if (session != null && session.isConnected) {
+                // Show controller (Stop/Volume/etc)
+                 val dialog = MediaRouteControllerDialogFragment()
+                 dialog.show(supportFragmentManager, "CastController")
+            } else {
+                // Show chooser (Pick device)
+                val mergedSelector = castContext.mergedSelector
+                if (mergedSelector != null) {
+                    val dialog = MediaRouteChooserDialogFragment()
+                    dialog.routeSelector = mergedSelector
+                    dialog.show(supportFragmentManager, "CastChooser")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("FluxoCast", "Error showing cast dialog", e)
         }
     }
 
