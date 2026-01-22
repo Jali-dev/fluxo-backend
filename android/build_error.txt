@@ -1,0 +1,76 @@
+> Task :gradle:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle:compileKotlin UP-TO-DATE
+> Task :gradle:compileJava NO-SOURCE
+> Task :gradle:compileGroovy NO-SOURCE
+> Task :gradle:pluginDescriptors UP-TO-DATE
+> Task :gradle:processResources UP-TO-DATE
+> Task :gradle:classes UP-TO-DATE
+> Task :gradle:jar UP-TO-DATE
+
+> Configure project :app
+Warning: Flutter support for your project's Android Gradle Plugin version (Android Gradle Plugin version 8.5.0) will soon be dropped. Please upgrade your Android Gradle Plugin version to a version of at least Android Gradle Plugin version 8.6.0 soon.
+Alternatively, use the flag "--android-skip-build-dependency-validation" to bypass this check.
+
+Potential fix: Your project's AGP version is typically defined in the plugins block of the `settings.gradle` file (C:\Users\Jali-dev\Documents\PROYECTOS-DEV\FLUXO-APP\android/settings.gradle), by a plugin with the id of com.android.application. 
+If you don't see a plugins block, your project was likely created with an older template version. In this case it is most likely defined in the top-level build.gradle file (C:\Users\Jali-dev\Documents\PROYECTOS-DEV\FLUXO-APP\android/build.gradle) by the following line in the dependencies block of the buildscript: "classpath 'com.android.tools.build:gradle:<version>'".
+
+Warning: Flutter support for your project's Kotlin version (1.9.24) will soon be dropped. Please upgrade your Kotlin version to a version of at least 2.1.0 soon.
+Alternatively, use the flag "--android-skip-build-dependency-validation" to bypass this check.
+
+Potential fix: Your project's KGP version is typically defined in the plugins block of the `settings.gradle` file (C:\Users\Jali-dev\Documents\PROYECTOS-DEV\FLUXO-APP\android/settings.gradle), by a plugin with the id of org.jetbrains.kotlin.android. 
+If you don't see a plugins block, your project was likely created with an older template version, in which case it is most likely defined in the top-level build.gradle file (C:\Users\Jali-dev\Documents\PROYECTOS-DEV\FLUXO-APP\android/build.gradle) by the ext.kotlin_version property.
+
+
+> Task :app:ReleaseMinSdkCheck
+> Task :app:buildKotlinToolingMetadata UP-TO-DATE
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+
+> Task :app:compileFlutterBuildRelease
+lib/features/home/presentation/pages/home_page.dart:16:3: Error: Can't have modifier 'static' here.
+Try removing 'static'.
+  static const platform = MethodChannel('com.fluxo.fluxo/cast');
+  ^^^^^^
+lib/features/home/presentation/pages/home_page.dart:178:1: Error: Expected a declaration, but got '}'.
+}
+^
+lib/features/home/presentation/pages/home_page.dart:13:36: Error: The method '_HomePageState' isn't defined for the type 'HomePage'.
+ - 'HomePage' is from 'package:fluxo/features/home/presentation/pages/home_page.dart' ('lib/features/home/presentation/pages/home_page.dart').
+Try correcting the name to the name of an existing method, or defining a method named '_HomePageState'.
+  State<HomePage> createState() => _HomePageState();
+                                   ^^^^^^^^^^^^^^
+lib/features/home/presentation/pages/home_page.dart:20:5: Error: Expected identifier, but got 'super'.
+    super.initState();
+    ^^^^^
+lib/features/home/presentation/pages/home_page.dart:50:5: Error: Undefined name 'context'.
+    context.read<HomeCubit>().onLinkReceived(link);
+    ^^^^^^^
+lib/features/home/presentation/pages/home_page.dart:58:5: Error: Expected identifier, but got 'super'.
+    super.dispose();
+    ^^^^^
+Target kernel_snapshot_program failed: Exception
+
+
+> Task :app:compileFlutterBuildRelease FAILED
+
+[Incubating] Problems report is available at: file:///C:/Users/Jali-dev/Documents/PROYECTOS-DEV/FLUXO-APP/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileFlutterBuildRelease'.
+> Process 'command 'C:\src\flutter\bin\flutter.bat'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+BUILD FAILED in 7s
+8 actionable tasks: 3 executed, 5 up-to-date
