@@ -74,18 +74,42 @@ class SnifferService {
   }
 
   bool _isVideoUrl(String url) {
-    // Patrones comunes de video
-    if (url.contains(".m3u8") || 
-        url.contains(".mp4") || 
-        url.contains("video-den") || // Facebook CDN patterns pattern
-        url.contains("fbcdn.net")) {
-          
-       // Filtros negativos (cosas que parecen video pero no son el stream principal)
-       if (url.contains("bytestart") && url.contains("byteend")) return true; // Range requests OK
-       if (url.contains(".png") || url.contains(".jpg")) return false; 
-       
-       return true;
+    // 1. Filtro Negativo Estricto: Si es un asset estático, RECHAZAR inmediatamente.
+    if (url.contains(".css") || 
+        url.contains(".js") || 
+        url.contains(".png") || 
+        url.contains(".jpg") || 
+        url.contains(".gif") || 
+        url.contains(".svg") || 
+        url.contains(".woff") || 
+        url.contains(".ttf") || 
+        url.contains(".json") || 
+        url.contains(".ico")) {
+      return false;
     }
+
+    // 2. Filtro Positivo: Extensiones de Video explícitas
+    if (url.contains(".m3u8") || url.contains(".mp4")) {
+      return true;
+    }
+
+    // 3. Filtro Específico FbCDN (Videos de Facebook)
+    // Los videos de FB suelen tener URLs largas sin extensión clara, pero vienen de fbcdn.net
+    // y suelen tener parámetros como 'bytestart', 'efg', o 'nc_cat' si son segmentos.
+    if (url.contains("fbcdn.net") || url.contains("video-den")) {
+       // Verificaciones adicionales para asegurar que es video y no basura
+       if (url.contains("bytestart") || 
+           url.contains("efg=") || 
+           url.contains("oe=") || // Token expiration param often present in media
+           url.contains("nc_cat")) {
+         return true;
+       }
+       // Si es fbcdn pero no tiene indicio claro de ser media stream, mejor ser conservador
+       // o retornamos true si nos arriesgamos, pero en este caso el .css pasó por aquí.
+       // Al haber filtrado .css arriba, es más seguro retornar true aquí si confiamos.
+       return true; 
+    }
+    
     return false;
   }
 
