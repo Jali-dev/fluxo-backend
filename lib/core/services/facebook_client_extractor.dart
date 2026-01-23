@@ -85,6 +85,6 @@ class FacebookClientExtractor {
 
   String _cleanUrl(String url) {
     // Facebook escapa los slashes como \/
-    return url.replaceAll(r'\/', '/').replaceAll(r'\u0025', '%');
+    return url.replaceAll(r'\/', '/').replaceAll(r'\u0025', '%').replaceAll(r'\u0026', '&');
   }
 }

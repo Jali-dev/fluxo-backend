@@ -80,7 +80,8 @@ class SnifferService {
 
   bool _isVideoUrl(String url) {
     // 1. Filtro Negativo Estricto: Si es un asset estático, RECHAZAR inmediatamente.
-    // Esto es crucial para evitar que un .css o .js en fbcdn.net active el positivo.
+    if (url.startsWith("blob:") || url.startsWith("data:")) return false;
+    
     if (url.contains(".css") || 
         url.contains(".js") || 
         url.contains(".png") || 
