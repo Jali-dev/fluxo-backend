@@ -20,12 +20,19 @@ class HomeCubit extends Cubit<HomeState> {
       emit(HomeLoading());
       
       // Extract URL from text
+      // Extract URL from text
+      // Usamos un regex más simple pero permisivo para capturar la URL completa con parámetros
       final RegExp urlRegExp = RegExp(
-        r'((https?:www\.)|(https?:\/\/)|(www\.))[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9]{1,6}(\/[-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)?',
+        r'https?://(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?://[^\s]+',
         caseSensitive: false,
       );
       
-      final String? cleanUrl = urlRegExp.firstMatch(link)?.group(0);
+      String? cleanUrl = urlRegExp.firstMatch(link)?.group(0);
+      
+      // Cleanup cleanup (trailing chars often captured by assertive regexes)
+      if (cleanUrl != null && (cleanUrl.endsWith(".") || cleanUrl.endsWith(")"))) {
+        cleanUrl = cleanUrl.substring(0, cleanUrl.length - 1);
+      }
       
       if (cleanUrl == null) {
         throw Exception("No valid URL found in the shared text");

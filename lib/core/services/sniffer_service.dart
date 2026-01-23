@@ -35,13 +35,18 @@ class SnifferService {
         },
         onLoadStop: (controller, url) async {
            // print("Sniffer: Load Stopped $url");
-           // A veces es necesario ejecutar JS para forzar la reproducción
-           /*
-           await controller.evaluateJavascript(source: """
-             var videos = document.getElementsByTagName('video');
-             if(videos.length > 0) { videos[0].play(); }
-           """);
-           */
+           // Ejecutar JS para forzar la reproducción (necesario para VODs/Lives que no autoinician)
+           try {
+             await controller.evaluateJavascript(source: """
+               var videos = document.getElementsByTagName('video');
+               for(var i=0; i<videos.length; i++) {
+                 videos[i].muted = true; // Mute required for autoplay usually
+                 videos[i].play();
+               }
+             """);
+           } catch (e) {
+             // Ignore JS errors
+           }
         },
         shouldInterceptRequest: (controller, request) async {
           final String url = request.url.toString();
