@@ -98,7 +98,9 @@ class _SnifferPageState extends State<SnifferPage> {
         url: _detectedVideoUrl!,
         title: "Web Video Stream",
         imageUrl: "",
-        contentType: 'video/mp4',
+        contentType: _detectedVideoUrl!.contains('.m3u8') 
+            ? 'application/x-mpegURL' 
+            : (_detectedVideoUrl!.contains('.mpd') ? 'application/dash+xml' : 'video/mp4'),
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

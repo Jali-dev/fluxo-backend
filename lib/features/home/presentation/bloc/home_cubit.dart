@@ -94,7 +94,9 @@ class HomeCubit extends Cubit<HomeState> {
           url: video.directUrl,
           title: video.title,
           imageUrl: video.thumbnail,
-          contentType: 'video/mp4',
+          contentType: video.directUrl.contains('.m3u8') 
+            ? 'application/x-mpegURL' 
+            : (video.directUrl.contains('.mpd') ? 'application/dash+xml' : 'video/mp4'),
         );
       } catch (e) {
         print("Auto-cast failed: $e");
@@ -104,21 +106,7 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 
-  Future<void> stopCast() async {
-    await _castService.stop();
-  }
-
-  Future<void> pauseCast() async {
-    await _castService.pause();
-  }
-
-  Future<void> playCast() async {
-    await _castService.play();
-  }
-
-  Future<void> setVolume(double vol) async {
-    await _castService.setVolume(vol);
-  }
+// ... (existing code)
 
   Future<void> loadVideoToCast() async {
     final state = this.state;
@@ -127,6 +115,9 @@ class HomeCubit extends Cubit<HomeState> {
           url: state.video.directUrl,
           title: state.video.title,
           imageUrl: state.video.thumbnail,
+          contentType: state.video.directUrl.contains('.m3u8') 
+            ? 'application/x-mpegURL' 
+            : (state.video.directUrl.contains('.mpd') ? 'application/dash+xml' : 'video/mp4'),
        );
     }
   }
