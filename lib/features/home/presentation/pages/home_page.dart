@@ -97,6 +97,17 @@ class _HomePageState extends State<HomePage> {
                     Text('Extrayendo video...'),
                   ],
                 );
+              } else if (state is HomeSniffing) {
+                 return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(color: Colors.orange),
+                    const SizedBox(height: 16),
+                    Text(state.message, style: const TextStyle(color: Colors.orange)),
+                    const SizedBox(height: 8),
+                    const Text("Activando modo 'Sniffer' invisible...", style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  ],
+                );
               } else if (state is HomeVideoLoaded) {
                  final video = state.video;
                  return SingleChildScrollView(

@@ -20,6 +20,14 @@ class HomeVideoLoaded extends HomeState {
   List<Object?> get props => [video];
 }
 
+class HomeSniffing extends HomeState {
+  final String message;
+  const HomeSniffing(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
 class HomeError extends HomeState {
   final String message;
   const HomeError(this.message);
