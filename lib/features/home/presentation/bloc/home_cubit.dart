@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluxo/core/services/cast_service.dart';
 import 'package:fluxo/core/services/sniffer_service.dart';
+import 'package:fluxo/core/services/facebook_client_extractor.dart';
 import 'package:fluxo/features/home/domain/entities/video_entity.dart';
 import 'package:fluxo/features/home/domain/repositories/video_repository.dart';
 import 'home_state.dart';
@@ -9,6 +10,7 @@ class HomeCubit extends Cubit<HomeState> {
   final VideoRepository repository;
   final CastService _castService = CastService();
   final SnifferService _snifferService = SnifferService();
+  final FacebookClientExtractor _clientExtractor = FacebookClientExtractor();
 
   HomeCubit({required this.repository}) : super(HomeInitial());
 
@@ -44,12 +46,31 @@ class HomeCubit extends Cubit<HomeState> {
       try {
         video = await repository.extractVideo(cleanUrl);
       } catch (e) {
-        print("Standard extraction failed: $e. Switching to Sniffer Mode.");
+        print("Standard extraction failed: $e. Switching to Fallbacks.");
       }
 
-      // 2. Fallback: Sniffer Mode
+      // 2. Fallback A: Client-Side Extraction (HTML Parsing)
       if (video == null) {
-        emit(const HomeSniffing("Buscando señal de video en la web..."));
+         emit(const HomeSniffing("Analizando código fuente de la página..."));
+         try {
+           final String? extractedUrl = await _clientExtractor.extractVideoUrl(cleanUrl);
+           if (extractedUrl != null) {
+              video = VideoEntity(
+                title: "Video Detectado (Nativo)",
+                thumbnail: "", 
+                directUrl: extractedUrl,
+                type: "video",
+              );
+              print("Client Extractor Found URL: $extractedUrl");
+           }
+         } catch (e) {
+           print("Client Extractor failed: $e");
+         }
+      }
+
+      // 3. Fallback B: Sniffer Mode (WebView) - Last Resort
+      if (video == null) {
+        emit(const HomeSniffing("Buscando señal de video en la web (Modo Sniffer)..."));
         final String? sniffedUrl = await _snifferService.sniffVideo(cleanUrl);
         
         if (sniffedUrl != null) {
@@ -60,7 +81,7 @@ class HomeCubit extends Cubit<HomeState> {
             type: "video",
           );
         } else {
-           throw Exception("No se pudo extraer el video ni con modo Web.");
+           throw Exception("No se pudo extraer el video con ningún método.");
         }
       }
 
