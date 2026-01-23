@@ -5,6 +5,7 @@ import 'package:flutter/services.dart'; // For MethodChannel
 // import 'package:receive_sharing_intent_plus/receive_sharing_intent_plus.dart';
 import 'package:fluxo/features/home/presentation/bloc/home_cubit.dart';
 import 'package:fluxo/features/home/presentation/bloc/home_state.dart';
+import 'package:fluxo/features/home/presentation/pages/sniffer_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -194,6 +195,19 @@ class _HomePageState extends State<HomePage> {
                     ElevatedButton(
                       onPressed: () => context.read<HomeCubit>().retry(),
                       child: const Text('Intentar de nuevo'),
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton.icon(
+                      icon: const Icon(Icons.open_in_browser),
+                      label: const Text('Probar Modo Web Interactivo'),
+                      onPressed: () {
+                        final link = context.read<HomeCubit>().currentLink;
+                        if (link != null) {
+                           Navigator.push(context, MaterialPageRoute(builder: (_) => SnifferPage(initialUrl: link)));
+                        } else {
+                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("No hay link disponible")));
+                        }
+                      },
                     )
                   ],
                 );

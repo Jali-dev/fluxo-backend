@@ -15,6 +15,7 @@ class HomeCubit extends Cubit<HomeState> {
   HomeCubit({required this.repository}) : super(HomeInitial());
 
   String? _lastLink;
+  String? get currentLink => _lastLink;
 
   Future<void> onLinkReceived(String link) async {
     _lastLink = link;
