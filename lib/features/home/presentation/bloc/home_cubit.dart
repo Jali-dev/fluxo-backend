@@ -106,7 +106,21 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 
-// ... (existing code)
+  Future<void> stopCast() async {
+    await _castService.stop();
+  }
+
+  Future<void> pauseCast() async {
+    await _castService.pause();
+  }
+
+  Future<void> playCast() async {
+    await _castService.play();
+  }
+
+  Future<void> setVolume(double vol) async {
+    await _castService.setVolume(vol);
+  }
 
   Future<void> loadVideoToCast() async {
     final state = this.state;
