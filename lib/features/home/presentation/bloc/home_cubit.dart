@@ -28,17 +28,42 @@ class HomeCubit extends Cubit<HomeState> {
   Future<void> setVolume(double vol) async {
     await _castService.setVolume(vol);
   }
-  Future<void> onLinkReceived(String url) async {
+  String? _lastLink;
+  
+  Future<void> onLinkReceived(String link) async {
+    _lastLink = link;
     try {
       emit(HomeLoading());
-      final video = await repository.extractVideo(url);
+      
+      // Extract URL from text (Facebook often sends "Watch this video... https://...")
+      final RegExp urlRegExp = RegExp(
+        r'((https?:www\.)|(https?:\/\/)|(www\.))[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9]{1,6}(\/[-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)?',
+        caseSensitive: false,
+      );
+      
+      final String? cleanUrl = urlRegExp.firstMatch(link)?.group(0);
+      
+      if (cleanUrl == null) {
+        throw Exception("No valid URL found in the shared text");
+      }
+      
+      final video = await repository.extractVideo(cleanUrl);
       emit(HomeVideoLoaded(video));
     } catch (e) {
       emit(HomeError("Error extracting video: $e"));
     }
   }
 
+  void retry() {
+    if (_lastLink != null) {
+      onLinkReceived(_lastLink!);
+    } else {
+      reset();
+    }
+  }
+
   void reset() {
+    _lastLink = null;
     emit(HomeInitial());
   }
 }

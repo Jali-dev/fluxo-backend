@@ -176,7 +176,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(
-                      onPressed: () => context.read<HomeCubit>().reset(),
+                      onPressed: () => context.read<HomeCubit>().retry(),
                       child: const Text('Intentar de nuevo'),
                     )
                   ],
