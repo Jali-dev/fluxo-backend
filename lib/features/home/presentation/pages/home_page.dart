@@ -133,6 +133,11 @@ class _HomePageState extends State<HomePage> {
                          mainAxisAlignment: MainAxisAlignment.center,
                          children: [
                            IconButton(
+                             icon: const Icon(Icons.cast_connected, color: Colors.blue),
+                             onPressed: () => context.read<HomeCubit>().loadVideoToCast(),
+                             tooltip: "Reproducir en TV",
+                           ),
+                           IconButton(
                              icon: const Icon(Icons.stop, color: Colors.red),
                              onPressed: () => context.read<HomeCubit>().stopCast(),
                              tooltip: "Stop",

@@ -49,8 +49,32 @@ class HomeCubit extends Cubit<HomeState> {
       
       final video = await repository.extractVideo(cleanUrl);
       emit(HomeVideoLoaded(video));
+      
+      // Auto-load to Cast if connected
+      try {
+        await _castService.loadMedia(
+          url: video.directUrl,
+          title: video.title,
+          imageUrl: video.thumbnail,
+          contentType: 'video/mp4', // Adjust if needed based on video.type or metadata
+        );
+      } catch (e) {
+        // Ignore cast errors if not connected, user can connect manually and we might need a "Cast Now" button
+        print("Auto-cast failed (likely not connected): $e");
+      }
     } catch (e) {
       emit(HomeError("Error extracting video: $e"));
+    }
+  }
+
+  Future<void> loadVideoToCast() async {
+    final state = this.state;
+    if (state is HomeVideoLoaded) {
+       await _castService.loadMedia(
+          url: state.video.directUrl,
+          title: state.video.title,
+          imageUrl: state.video.thumbnail,
+       );
     }
   }
 
