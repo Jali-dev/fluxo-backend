@@ -82,8 +82,11 @@ class _SnifferPageState extends State<SnifferPage> {
   bool _isVideoUrl(String url) {
      if (url.startsWith("blob:") || url.startsWith("data:")) return false;
      if (url.contains(".css") || url.contains(".js") || url.contains(".png") || url.contains(".jpg")) return false; 
+     // Simple logic: if it looks like video, take it.
+     // BUT EXCLUDE segments (bytestart/byteend)
+     if (url.contains("bytestart") || url.contains("byteend") || url.contains("range=")) return false;
+
      if (url.contains(".m3u8") || url.contains(".mp4") || url.contains(".mpd") || url.contains("fbcdn.net")) {
-        // Simple logic: if it looks like video, take it.
         return true;
      }
      return false;

@@ -103,9 +103,14 @@ class SnifferService {
     }
 
     // 3. Filtro Específico FbCDN (Videos de Facebook)
-    // Si la URL viene de los CDNs de video de Facebook y NO es un archivo estático (filtrado arriba),
-    // asumimos que es un segmento de video o el stream mismo.
-    // Lives suelen usar DASH (.mpd) o segmentos crudos sin extensión clara pero en estos dominios.
+    // CRITICO: Evitar "segmentos" de video. Buscamos el MANIFIESTO o el VIDEO COMPLETO.
+    // Si la URL contiene 'bytestart' o 'byteend', es un segmento parcial. Chromecast NO reproduce esto.
+    if (url.contains("bytestart") || 
+        url.contains("byteend") || 
+        url.contains("range=")) {
+      return false;
+    }
+
     if (url.contains("fbcdn.net") || url.contains("video-den") || url.contains("googlevideo.com")) {
        return true; 
     }
