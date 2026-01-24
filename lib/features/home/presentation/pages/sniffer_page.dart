@@ -55,22 +55,61 @@ class _SnifferPageState extends State<SnifferPage> {
           ),
           if (_isVideoDetected)
             Positioned(
-              bottom: 30,
-              left: 20,
-              right: 20,
-              child: Card(
-                color: Colors.orange,
-                child: ListTile(
-                  title: const Text("¡Video Detectado!",
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  subtitle: Text(_detectedVideoUrl ?? "",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Colors.white70)),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.cast_connected, color: Colors.white, size: 32),
-                    onPressed: _castToTv,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF1E1E1E), // Dark background
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
                   ),
+                  boxShadow: [
+                     BoxShadow(color: Colors.black45, blurRadius: 10, offset: Offset(0, -4)),
+                  ]
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.check_circle_outline, color: Colors.greenAccent, size: 28),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Text(
+                            "Video Detectado",
+                            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        // Mini preview of URL domain only
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                              color: Colors.white10,
+                              borderRadius: BorderRadius.circular(8)
+                          ),
+                          child: const Text("LISTO", style: TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold)),
+                        )
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.cast_connected, color: Colors.white),
+                        label: const Text("ENVIAR A LA TV", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2196F3),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          elevation: 4,
+                        ),
+                        onPressed: _castToTv,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

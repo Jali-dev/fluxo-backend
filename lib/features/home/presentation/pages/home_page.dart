@@ -115,68 +115,73 @@ class _HomePageState extends State<HomePage> {
                    child: Column(
                      mainAxisAlignment: MainAxisAlignment.center,
                      children: [
-                       if (video.thumbnail.isNotEmpty)
-                         Image.network(video.thumbnail, errorBuilder: (_,__,___) => const Icon(Icons.broken_image, size: 50)),
-                       const SizedBox(height: 20),
+                       Container(
+                         height: 200,
+                         width: double.infinity,
+                         decoration: BoxDecoration(
+                           color: Colors.black12,
+                           borderRadius: BorderRadius.circular(16),
+                           image: video.thumbnail.isNotEmpty
+                               ? DecorationImage(image: NetworkImage(video.thumbnail), fit: BoxFit.cover)
+                               : null,
+                         ),
+                         child: video.thumbnail.isEmpty
+                             ? const Icon(Icons.movie_creation_outlined, size: 80, color: Colors.white54)
+                             : null,
+                       ),
+                       const SizedBox(height: 24),
                        Text(
-                         video.title,
-                         style: Theme.of(context).textTheme.headlineSmall,
+                         video.title.isEmpty ? "Video Detectado" : video.title,
+                         style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                          textAlign: TextAlign.center,
                        ),
-                       const SizedBox(height: 10),
-                       Chip(label: Text(video.type.toUpperCase())),
+                       const SizedBox(height: 8),
+                       Chip(
+                         label: Text(video.type.toUpperCase()),
+                         backgroundColor: Colors.blueAccent.withOpacity(0.1),
+                         labelStyle: const TextStyle(color: Colors.blueAccent),
+                       ),
+                       const SizedBox(height: 32),
+                       SizedBox(
+                         width: double.infinity,
+                         height: 56,
+                         child: ElevatedButton.icon(
+                           icon: const Icon(Icons.cast_connected),
+                           label: const Text("ENVIAR A LA TV", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                           style: ElevatedButton.styleFrom(
+                             backgroundColor: const Color(0xFF2196F3),
+                             foregroundColor: Colors.white,
+                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                             elevation: 4,
+                           ),
+                           onPressed: () => context.read<HomeCubit>().loadVideoToCast(),
+                         ),
+                       ),
                        const SizedBox(height: 20),
-                       Text(
-                         'Direct URL:',
-                         style: Theme.of(context).textTheme.labelLarge,
-                       ),
-                        SelectableText(
-                          video.directUrl,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.blueAccent, fontSize: 12),
-                          maxLines: 3,
-                          // overflow: TextOverflow.ellipsis, // SelectableText doesn't support overflow ellipsis effectively in all versions, but maxLines helps.
-                        ),
-                       const SizedBox(height: 30),
-                       const Divider(),
-                       const Text("Controles Cast", style: TextStyle(fontWeight: FontWeight.bold)),
-                       const SizedBox(height: 10),
+                       // Solo controles básicos si ya está conectado
+                       const Divider(height: 40),
                        Row(
                          mainAxisAlignment: MainAxisAlignment.center,
                          children: [
                            IconButton(
-                             icon: const Icon(Icons.cast_connected, color: Colors.blue),
-                             onPressed: () => context.read<HomeCubit>().loadVideoToCast(),
-                             tooltip: "Reproducir en TV",
-                           ),
-                           IconButton(
-                             icon: const Icon(Icons.stop, color: Colors.red),
+                             icon: const Icon(Icons.stop_circle_outlined, size: 32, color: Colors.redAccent),
                              onPressed: () => context.read<HomeCubit>().stopCast(),
-                             tooltip: "Stop",
+                             tooltip: "Detener",
                            ),
+                           const SizedBox(width: 20),
                            IconButton(
-                             icon: const Icon(Icons.pause),
-                             onPressed: () => context.read<HomeCubit>().pauseCast(),
-                             tooltip: "Pause",
-                           ),
-                           IconButton(
-                             icon: const Icon(Icons.play_arrow),
+                             icon: const Icon(Icons.play_circle_fill, size: 48, color: Colors.blue),
                              onPressed: () => context.read<HomeCubit>().playCast(),
-                             tooltip: "Play",
+                             tooltip: "Reproducir",
+                           ),
+                           const SizedBox(width: 20),
+                           IconButton(
+                             icon: const Icon(Icons.pause_circle_outlined, size: 32),
+                             onPressed: () => context.read<HomeCubit>().pauseCast(),
+                             tooltip: "Pausar",
                            ),
                          ],
                        ),
-                       Row(
-                         mainAxisAlignment: MainAxisAlignment.center,
-                         children: [
-                           const Icon(Icons.volume_down, size: 20),
-                           Slider(
-                             value: 0.5, 
-                             onChanged: (val) => context.read<HomeCubit>().setVolume(val),
-                           ),
-                           const Icon(Icons.volume_up, size: 20),
-                         ],
-                       )
                      ],
                    ),
                  );
