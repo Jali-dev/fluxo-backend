@@ -1,18 +1,24 @@
-# FLUXO-APP
+# Fluxo App
 
-## Fluxo - Android Application
+Fluxo es una aplicación Android desarrollada en Flutter para transmitir videos de la web a dispositivos Google Cast (Chromecast, Google TV, etc.).
 
-A new Flutter project to download and play videos from shared links.
+## Características Principales
 
-## Getting Started
+* **Navegador Web Integrado**: Permite navegar por sitios web de streaming.
+* **Detector de Videos (Web Caster)**: Intenta detectar enlaces de video (m3u8, mp4, dash) en la página actual.
+* **Soporte Google Cast**: Envío de contenido detectado a TV.
 
-This project is a starting point for a Flutter application.
+## ⚠️ Estado Actual y Problemas Conocidos
 
-A few resources to get you started if this is your first Flutter project:
+> **IMPORTANTE:** La función de detección automática de enlaces de video ("Video Sniffer") **NO FUNCIONA CORRECTAMENTE** en este momento.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+* La detección automática falla en la mayoría de los sitios modernos con protección o iframes complejos.
+* El botón de "Escanear Manualmente" puede no devolver resultados fiables.
+* Se está trabajando en una solución más robusta similar a "Web Video Caster", pero actualmente la funcionalidad es inestable o nula.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Instalación
+
+1. Clonar el repositorio.
+2. Ejecutar `flutter pub get`.
+3. Configurar credenciales de Android si es necesario.
+4. Compilar con `flutter build apk --release`.

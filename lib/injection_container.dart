@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:fluxo/core/services/cast_service.dart';
 import 'package:fluxo/features/home/data/datasources/video_remote_data_source.dart';
 import 'package:fluxo/features/home/data/repositories/video_repository_impl.dart';
 import 'package:fluxo/features/home/domain/repositories/video_repository.dart';
@@ -10,6 +11,9 @@ final sl = GetIt.instance; // Service Locator
 Future<void> init() async {
   // Blocs
   sl.registerFactory(() => HomeCubit(repository: sl()));
+
+  // Services
+  sl.registerLazySingleton(() => CastService());
 
   // Repositories
   sl.registerLazySingleton<VideoRepository>(

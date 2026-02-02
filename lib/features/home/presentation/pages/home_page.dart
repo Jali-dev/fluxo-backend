@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter/services.dart'; // For MethodChannel
-// import 'package:receive_sharing_intent_plus/receive_sharing_intent_plus.dart';
+import 'package:flutter/services.dart';
 import 'package:fluxo/features/home/presentation/bloc/home_cubit.dart';
 import 'package:fluxo/features/home/presentation/bloc/home_state.dart';
-import 'package:fluxo/features/home/presentation/pages/sniffer_page.dart';
+import 'package:fluxo/features/web_caster/screens/web_caster_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,11 +19,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
-    // 1. Cold Start: Check if app was opened with a link
     _checkInitialLink();
-
-    // 2. Warm Start: Listen for new links while app is open
     platform.setMethodCallHandler((call) async {
       if (call.method == "onLinkReceived") {
         debugPrint("Native link received: ${call.arguments}");
@@ -53,19 +48,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  void dispose() {
-    // Remove method call handler? Typically not explicitly needed for singleton widget
-    // but good practice if we want to stop listening.
-    // platform.setMethodCallHandler(null);
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Fluxo Player'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.public),
+            onPressed: () {
+               Navigator.push(context, MaterialPageRoute(builder: (_) => const WebCasterScreen()));
+            },
+            tooltip: "Navegador Web",
+          ),
           IconButton(
             icon: const Icon(Icons.cast),
             onPressed: () {
@@ -81,12 +75,20 @@ class _HomePageState extends State<HomePage> {
           child: BlocBuilder<HomeCubit, HomeState>(
             builder: (context, state) {
               if (state is HomeInitial) {
-                return const Column(
+                return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                     Icon(Icons.share, size: 64, color: Colors.grey),
-                     SizedBox(height: 16),
-                     Text('Comparte un enlace de Facebook con Fluxo para comenzar.'),
+                     const Icon(Icons.share, size: 64, color: Colors.grey),
+                     const SizedBox(height: 16),
+                     const Text('Comparte un enlace de Facebook con Fluxo para comenzar.', textAlign: TextAlign.center),
+                     const SizedBox(height: 32),
+                     ElevatedButton.icon(
+                       icon: const Icon(Icons.search),
+                       label: const Text("ABRIR NAVEGADOR WEB"),
+                       onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const WebCasterScreen()));
+                       },
+                     )
                   ],
                 );
               } else if (state is HomeLoading) {
@@ -158,7 +160,6 @@ class _HomePageState extends State<HomePage> {
                          ),
                        ),
                        const SizedBox(height: 20),
-                       // Solo controles básicos si ya está conectado
                        const Divider(height: 40),
                        Row(
                          mainAxisAlignment: MainAxisAlignment.center,
@@ -204,14 +205,18 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(height: 12),
                     TextButton.icon(
                       icon: const Icon(Icons.open_in_browser),
-                      label: const Text('Probar Modo Web Interactivo'),
+                      label: const Text('Probar Navegador Web'),
                       onPressed: () {
+                        // Use WebCaster instead of SnifferPage
                         final link = context.read<HomeCubit>().currentLink;
-                        if (link != null) {
-                           Navigator.push(context, MaterialPageRoute(builder: (_) => SnifferPage(initialUrl: link)));
-                        } else {
-                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("No hay link disponible")));
-                        }
+                        Navigator.push(
+                          context, 
+                          MaterialPageRoute(
+                            builder: (_) => WebCasterScreen(
+                              initialUrl: link ?? "https://librefutboltv.su/home/directv-sports/"
+                            )
+                          )
+                        );
                       },
                     )
                   ],
@@ -225,4 +230,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
