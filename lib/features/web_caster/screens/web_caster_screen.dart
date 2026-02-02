@@ -4,6 +4,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluxo/core/services/cast_service.dart';
 import 'package:fluxo/injection_container.dart';
 import 'package:fluxo/core/constants/supported_video_formats.dart';
+import 'dart:collection';
 
 class VideoSource {
   final String url;
@@ -185,21 +186,58 @@ class _WebCasterScreenState extends State<WebCasterScreen> {
                     javaScriptEnabled: true,
                     userAgent: "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                   ),
+                  // MONKEY PATCHING: Inyectar script al inicio para interceptar Fetch y XHR
+                  initialUserScripts: UnmodifiableListView<UserScript>([
+                    UserScript(
+                      source: """
+                        (function() {
+                            console.log("🔥 FLUXO MONKEY PATCH ACTIVE");
+                            
+                            // 1. Interceptar FETCH
+                            const originalFetch = window.fetch;
+                            window.fetch = async function(...args) {
+                                const url = args[0] ? args[0].toString() : '';
+                                if (url.includes('.m3u8') || url.includes('.mp4') || (url.includes('.ts') && !url.includes('.ts?'))) {
+                                    // Comprobación preliminar rápida en JS
+                                    window.flutter_inappwebview.callHandler('VideoDetected', url);
+                                }
+                                return originalFetch.apply(this, args);
+                            };
+
+                            // 2. Interceptar XHR
+                            const originalOpen = XMLHttpRequest.prototype.open;
+                            XMLHttpRequest.prototype.open = function(method, url) {
+                                if (typeof url === 'string' && (url.includes('.m3u8') || url.includes('.mp4') || (url.includes('.ts') && !url.includes('.ts?')))) {
+                                     window.flutter_inappwebview.callHandler('VideoDetected', url);
+                                }
+                                return originalOpen.apply(this, arguments);
+                            };
+                        })();
+                      """,
+                      injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+                      forMainFrameOnly: false, // Importante: Interceptar en iframes también
+                    )
+                  ]),
                   onWebViewCreated: (controller) {
                     _webViewController = controller;
+                    
+                    // Handler para recibir las URLs interceptadas por el script
+                    controller.addJavaScriptHandler(handlerName: 'VideoDetected', callback: (args) {
+                      if (args.isNotEmpty) {
+                        final String url = args[0].toString();
+                        // Enviar a análisis (donde pasará por el filtro estricto y deduplicación)
+                        _analyzeUrl(url);
+                      }
+                    });
                   },
                   onLoadStop: (controller, url) async {
                     _urlController.text = url.toString();
                     String? title = await controller.getTitle();
                     if (title != null) _pageTitle = title;
-                    // _manualScan(); // Optional: Auto manual scan might be too aggressive if doing network logic
-                  },
-                  onProgressChanged: (controller, progress) {
-                    setState(() => _progress = progress / 100);
                   },
                   shouldInterceptRequest: (controller, request) async {
+                    // Mantener intercepción pasiva por si acaso
                     final String url = request.url.toString();
-                    // Async analysis
                     _analyzeUrl(url);
                     return null;
                   },
