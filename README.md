@@ -1,24 +1,30 @@
-# Fluxo App
+# Fluxo Player
 
 Fluxo es una aplicación Android desarrollada en Flutter para transmitir videos de la web a dispositivos Google Cast (Chromecast, Google TV, etc.).
 
-## Características Principales
+## ✨ Características Principales
 
-* **Navegador Web Integrado**: Permite navegar por sitios web de streaming.
-* **Detector de Videos (Web Caster)**: Intenta detectar enlaces de video (m3u8, mp4, dash) en la página actual.
-* **Soporte Google Cast**: Envío de contenido detectado a TV.
+* **Interfaz Moderna**: Diseño oscuro con gradientes coloridos y estética premium.
+* **Entrada de Enlaces**: Pega una URL directamente en la pantalla principal y toca "REPRODUCIR" para abrir el navegador integrado.
+* **Navegador Web Integrado (Web Caster)**: Permite navegar por sitios web de streaming con detección automática de videos.
+* **Detector de Videos**: Detecta enlaces de video (m3u8, mp4, dash) usando "Monkey Patching" para interceptar solicitudes.
+* **Soporte Google Cast**: Envía contenido detectado a TV compatible con Cast.
 
-## ⚠️ Estado Actual y Problemas Conocidos
+## 🚀 Cómo Usar
 
-> **IMPORTANTE:** La función de detección automática de enlaces de video ("Video Sniffer") **NO FUNCIONA CORRECTAMENTE** en este momento.
+1. Abre la app **Fluxo Player**.
+2. Pega un enlace de video en el campo "Pega tu enlace aquí...".
+3. Toca el botón **REPRODUCIR** para abrir el navegador.
+4. El navegador detectará automáticamente los videos en la página.
+5. Selecciona un video y envíalo a tu TV con Cast.
 
-* La detección automática falla en la mayoría de los sitios modernos con protección o iframes complejos.
-* El botón de "Escanear Manualmente" puede no devolver resultados fiables.
-* Se está trabajando en una solución más robusta similar a "Web Video Caster", pero actualmente la funcionalidad es inestable o nula.
+## ⚠️ Problemas Conocidos
 
-## Instalación
+> La detección automática puede fallar en sitios con protección DRM o iframes muy complejos. Usa el botón "Escanear Manualmente" en el menú del navegador si es necesario.
+
+## 📦 Instalación
 
 1. Clonar el repositorio.
 2. Ejecutar `flutter pub get`.
-3. Configurar credenciales de Android si es necesario.
-4. Compilar con `flutter build apk --release`.
+3. Compilar con `flutter build apk --release`.
+4. El APK estará en `build/app/outputs/flutter-apk/app-release.apk`.
