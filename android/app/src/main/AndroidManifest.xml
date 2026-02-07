@@ -3,7 +3,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <application android:label="fluxo" android:name="${applicationName}" android:icon="@mipmap/ic_launcher">
+    <application android:label="Fluxo" android:name="${applicationName}" android:icon="@mipmap/ic_launcher">
         <service android:name=".FluxoCastService" android:foregroundServiceType="mediaPlayback" android:exported="false" />
 
         <meta-data android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME" android:value="com.fluxo.fluxo.CastOptionsProvider" />

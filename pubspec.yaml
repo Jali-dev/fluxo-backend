@@ -35,6 +35,17 @@ dev_dependencies:
   # Code Generation
   build_runner: ^2.4.9
   injectable_generator: ^2.6.1
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/
+
